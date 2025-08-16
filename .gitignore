@@ -26,7 +26,6 @@ application.properties
 neokart-frontend/node_modules/
 neokart-frontend/build/
 neokart-frontend/dist/
-neokart-frontend/frontend.zip
 
 # -----------------------------
 # OS / IDE files
