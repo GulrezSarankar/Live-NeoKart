@@ -8,6 +8,8 @@ import com.twilio.rest.api.v2010.account.Message;
 
 import jakarta.annotation.PostConstruct;
 @Component
+
+
 public class OtpGenerator {
 	@Value("${twilio.account.sid}")
     private String ACCOUNT_SID;
