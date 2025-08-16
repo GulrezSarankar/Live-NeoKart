@@ -1,4 +1,6 @@
+# -----------------------------
 # Java / Spring Boot
+# -----------------------------
 /target/
 *.iml
 .classpath
@@ -7,11 +9,28 @@
 .factorypath
 .mvn/
 
+# -----------------------------
 # Secrets
+# -----------------------------
 .env
 application.properties
 
-
-
-# Uploads
+# -----------------------------
+# Uploads / file storage
+# -----------------------------
 /uploads/
+
+# -----------------------------
+# Frontend / React
+# -----------------------------
+neokart-frontend/node_modules/
+neokart-frontend/build/
+neokart-frontend/dist/
+neokart-frontend/frontend.zip
+
+# -----------------------------
+# OS / IDE files
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.log
