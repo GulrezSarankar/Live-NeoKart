@@ -11,10 +11,7 @@
 .env
 application.properties
 
-# Frontend dependencies / builds
-# neokart-frontend/node_modules/
-# neokart-frontend/build/
-# neokart-frontend/frontend.zip
+
 
 # Uploads
 /uploads/
