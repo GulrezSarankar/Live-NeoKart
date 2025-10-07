@@ -1,4 +1,6 @@
+# ======================
 # Java / Spring Boot
+# ======================
 /target/
 *.log
 *.class
@@ -6,21 +8,37 @@
 *.war
 *.iml
 
+# ======================
 # Environment & Config
+# ======================
 .env
 *.env
 
-# Node (React frontend)
+# ======================
+# React Frontend (NeoKart-Frontend)
+# ======================
+/neokart-frontend/node_modules/
+/neokart-frontend/build/
+/neokart-frontend/dist/
+/neokart-frontend/.env
+
+# ======================
+# Node (if running any Node tools in root)
+# ======================
 /node_modules/
 **/node_modules/
 build/
 dist/
 
-# IDE / OS files
-/.idea/
-/.vscode/
+# ======================
+# IDE / OS Files
+# ======================
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
 
+# ======================
 # Logs
+# ======================
 logs/
