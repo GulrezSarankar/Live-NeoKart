@@ -56,4 +56,10 @@ public class Product {
     @JsonManagedReference   // ✅ Break recursion here
 
     private List<ProductImage> images = new ArrayList<>();
+    
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<ProductVarient> variants = new ArrayList<>();
+
 }

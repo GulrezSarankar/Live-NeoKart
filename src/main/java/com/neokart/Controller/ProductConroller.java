@@ -206,6 +206,36 @@ public class ProductConroller {
         return ResponseEntity.ok(productService.searchProducts(q.trim()));
     }
 
+//// Bulk Add 
+//    @PostMapping("/bulk-upload")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<?> uploadBulkProducts(@RequestParam("file") MultipartFile file) {
+//        try {
+//            int savedCount = productService.saveProductsFromCsv(file);
+//            return ResponseEntity.ok(Map.of("message", "✅ " + savedCount + " products uploaded successfully"));
+//        } catch (IOException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Map.of("error", "❌ Failed to process file: " + e.getMessage()));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                    .body(Map.of("error", "⚠️ " + e.getMessage()));
+//        }
+//    }
+ // ✅ Bulk Upload from CSV
+    @PostMapping("/bulk-upload")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> uploadBulkProducts(@RequestParam("file") MultipartFile file) {
+        try {
+            int savedCount = productService.saveProductsFromCsv(file);
+            return ResponseEntity.ok(Map.of("message", "✅ " + savedCount + " products uploaded successfully"));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "❌ Failed to process file: " + e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "⚠️ " + e.getMessage()));
+        }
+    }
 
 	
 }

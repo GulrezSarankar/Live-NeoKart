@@ -136,6 +136,44 @@ public class EmailService {
 	            System.err.println("❌ Failed to send order status update email: " + e.getMessage());
 	        }
 	    }
+	    
+	 // ✅ Send Low Stock Alert Email to Admin
+	    public void sendLowStockAlertEmail(String adminEmail, String productName, int currentStock) {
+	        try {
+	            MimeMessage message = mailSender.createMimeMessage();
+	            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+	            helper.setTo(adminEmail);
+	            helper.setSubject("⚠️ Low Stock Alert: " + productName);
+
+	            String content = """
+	                <html>
+	                  <body style="font-family: Arial, sans-serif;">
+	                    <img src="cid:neokartLogo" alt="NeoKart Logo" style="max-height:80px; margin-bottom:20px;">
+	                    <h2 style="color: #E53935;">Low Stock Alert!</h2>
+	                    <p>Product: <strong>%s</strong></p>
+	                    <p>Current Stock: <strong>%d units</strong></p>
+	                    <p>Please restock soon to avoid running out of inventory.</p>
+	                    <a href="https://neokart.com/admin/inventory" style="display:inline-block; background-color:#FF5722;
+	                       color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
+	                       View Inventory
+	                    </a>
+	                    <p style="margin-top: 30px; font-size: 12px; color: #999;">&copy; 2025 NeoKart. All rights reserved.</p>
+	                  </body>
+	                </html>
+	                """.formatted(productName, currentStock);
+
+	            helper.setText(content, true);
+	            helper.addInline("neokartLogo", new ClassPathResource("static/images/NeoKart-logo.png"));
+	            mailSender.send(message);
+
+	            System.out.println("⚠️ Low stock alert sent to admin: " + adminEmail);
+
+	        } catch (MessagingException e) {
+	            System.err.println("❌ Failed to send low stock alert email: " + e.getMessage());
+	        }
+	    }
+
 	   
 	    
 	}
