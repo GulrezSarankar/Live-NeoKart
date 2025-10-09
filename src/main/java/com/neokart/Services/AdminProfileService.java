@@ -12,18 +12,22 @@ import com.neokart.Repository.UserRepository;
 public class AdminProfileService {
 	
 	
-	@Autowired
-	UserRepository userRepository;
-	
+    @Autowired
+    private UserRepository userRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
+    @Autowired
+    private AuditLogService auditLogService; // ✅ Log admin activities
 
     // ✅ Get admin profile
     public AdminProfileDto getProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        // Log view action (optional)
+        auditLogService.readaction(email, "Viewed profile");
 
         return new AdminProfileDto(
                 user.getId(),
@@ -33,26 +37,42 @@ public class AdminProfileService {
         );
     }
 
-    //  Update admin profile
+    // ✅ Update admin profile
     public AdminProfileDto updateProfile(String email, AdminProfileDto updatedProfile) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
 
-        user.setName(updatedProfile.getName());
-        user.setPhone(updatedProfile.getPhone());
-        user.setEmail(updatedProfile.getEmail());
+        boolean updated = false;
 
-        User savedUser = userRepository.save(user);
+        if (!user.getName().equals(updatedProfile.getName())) {
+            user.setName(updatedProfile.getName());
+            updated = true;
+        }
+        if (!user.getPhone().equals(updatedProfile.getPhone())) {
+            user.setPhone(updatedProfile.getPhone());
+            updated = true;
+        }
+        if (!user.getEmail().equals(updatedProfile.getEmail())) {
+            user.setEmail(updatedProfile.getEmail());
+            updated = true;
+        }
 
-        return new AdminProfileDto(
-                savedUser.getId(),
-                savedUser.getName(),
-                savedUser.getEmail(),
-                savedUser.getPhone()
-        );
+        if (updated) {
+            User savedUser = userRepository.save(user);
+            auditLogService.readaction(email, "Updated profile details");
+
+            return new AdminProfileDto(
+                    savedUser.getId(),
+                    savedUser.getName(),
+                    savedUser.getEmail(),
+                    savedUser.getPhone()
+            );
+        } else {
+            throw new RuntimeException("No changes detected in profile update.");
+        }
     }
 
-    //  Change password
+    // ✅ Change password
     public void changePassword(String email, String oldPassword, String newPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
@@ -61,8 +81,14 @@ public class AdminProfileService {
             throw new RuntimeException("Old password is incorrect");
         }
 
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new RuntimeException("New password cannot be same as old password");
+        }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+
+        auditLogService.readaction(email, "Changed account password");
     }
 
 }

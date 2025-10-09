@@ -40,6 +40,12 @@
 	<!-- Springdoc OpenAPI for Spring Boot 3 (Swagger UI) -->
 
 
+<dependency>
+    <groupId>com.google.firebase</groupId>
+    <artifactId>firebase-admin</artifactId>
+    <version>9.2.0</version>
+</dependency>
+
 
 		<dependency>
     <groupId>io.jsonwebtoken</groupId>
@@ -102,6 +108,16 @@
     <version>1.14.0</version>
 </dependency>
 
+<dependency>
+		    <groupId>io.springfox</groupId>
+		    <artifactId>springfox-boot-starter</artifactId>
+		    <version>3.0.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>io.swagger.core.v3</groupId>
+		    <artifactId>swagger-models</artifactId>
+		    <version>2.2.15</version> <!-- or version matching your usage -->
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

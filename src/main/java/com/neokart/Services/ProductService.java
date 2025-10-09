@@ -1,6 +1,9 @@
 package com.neokart.Services;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.neokart.DTO.ProductWithRatingDTO;
@@ -32,7 +36,6 @@ import com.neokart.Repository.ProductRatingRepository;
 import com.neokart.Repository.ProductRepository;
 import com.neokart.Repository.UserRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -274,6 +277,121 @@ public class ProductService {
         return userRepository.findByEmail(email).orElse(null);
     }
    
+    
+////    Bulk Add Products 
+//    @Transactional
+//    public int saveProductsFromCsv(MultipartFile file) throws IOException {
+//        if (file.isEmpty()) {
+//            throw new RuntimeException("CSV file is empty or missing");
+//        }
+//
+//        List<Product> products = new ArrayList<>();
+//
+//        // Read directly from file input stream
+//        List<String> lines = new BufferedReader(
+//                new InputStreamReader(file.getInputStream()))
+//                .lines()
+//                .collect(Collectors.toList());
+//
+//        if (lines.isEmpty()) {
+//            throw new RuntimeException("CSV file has no content");
+//        }
+//
+//        // Skip header line
+//        for (int i = 1; i < lines.size(); i++) {
+//            String[] data = lines.get(i).split(",");
+//
+//            if (data.length < 7) {
+//                throw new RuntimeException("Invalid CSV format at line " + (i + 1));
+//            }
+//
+//            Product product = new Product();
+//            product.setName(data[0].trim());
+//            product.setDescription(data[1].trim());
+//            product.setPrice(new BigDecimal(data[2].trim()));
+//            product.setStock(Integer.parseInt(data[3].trim()));
+//            product.setSku(data[4].trim());
+//            product.setCategory(data[5].trim());
+//            product.setSubCategory(data[6].trim());
+//            product.setImages(new ArrayList<>());
+//
+//            products.add(product);
+//        }
+//
+//        productRepository.saveAll(products);
+//        return products.size();
+//    }
+    
+    public int saveProductsFromCsv(MultipartFile file) throws IOException {
+        List<Product> products = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String header = reader.readLine(); // Skip header
+            if (header == null) throw new IOException("Empty CSV file");
+
+            String line;
+            int lineNumber = 0;
+
+            while ((line = reader.readLine()) != null) {
+                lineNumber++;
+                if (line.trim().isEmpty()) continue;
+
+                String[] data = line.split(",", -1); // keep empty cells
+
+                if (data.length < 8) {
+                    System.err.println("⚠️ Skipping line " + lineNumber + " - insufficient columns");
+                    continue;
+                }
+
+                try {
+                    Product product = new Product();
+                    product.setName(data[0].trim());
+                    product.setDescription(data[1].trim());
+
+                    // 🧮 Safe numeric parsing
+                    String priceStr = data[2].replaceAll("[^0-9.]", "").trim();
+                    String stockStr = data[3].replaceAll("[^0-9]", "").trim();
+                    product.setPrice(new BigDecimal(priceStr.isEmpty() ? "0" : priceStr));
+                    product.setStock(Integer.parseInt(stockStr.isEmpty() ? "0" : stockStr));
+
+                    product.setSku(data[4].trim());
+                    product.setCategory(data[5].trim());
+                    product.setSubCategory(data[6].trim());
+
+                    // 🖼️ Multiple image URLs
+                    String imageUrls = data[7].trim();
+                    List<ProductImage> imageList = new ArrayList<>();
+
+                    if (!imageUrls.isEmpty()) {
+                        String[] urls = imageUrls.split("[;,]"); // both , and ; accepted
+                        for (int i = 0; i < urls.length; i++) {
+                            String url = urls[i].trim();
+                            if (!url.isEmpty()) {
+                                ProductImage image = ProductImage.builder()
+                                        .imageUrl(url)
+                                        .isPrimary(i == 0) // first image = main
+                                        .product(product)
+                                        .build();
+                                imageList.add(image);
+                            }
+                        }
+                    }
+
+                    product.setImages(imageList);
+                    products.add(product);
+
+                } catch (Exception e) {
+                    System.err.println("⚠️ Skipping invalid line " + lineNumber + ": " + e.getMessage());
+                }
+            }
+        }
+
+        // 💾 Save all products (images cascade automatically)
+        productRepository.saveAll(products);
+        return products.size();
+    }
+
+
  
 }
 
