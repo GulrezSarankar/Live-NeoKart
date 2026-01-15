@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.neokart.DTO.ProductWithRatingDTO;
 import com.neokart.Entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -40,6 +41,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
 
     // Find by category with pagination
+    
+    @Query("""
+    		SELECT new com.neokart.DTO.ProductWithRatingDTO(p, COALESCE(AVG(r.stars),0))
+    		FROM Product p
+    		LEFT JOIN p.ratings r
+    		WHERE LOWER(p.category)=LOWER(:category)
+    		AND p.id <> :productId
+    		GROUP BY p
+    		ORDER BY AVG(r.stars) DESC
+    		""")
+    		List<ProductWithRatingDTO> findRelatedWithRating(String category, Long productId);
+
  
 
 	

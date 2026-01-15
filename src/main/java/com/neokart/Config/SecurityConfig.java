@@ -42,36 +42,38 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ enable CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/uploads/**").permitAll()   // ✅ allow product images
-                    
-                    .requestMatchers(HttpMethod.DELETE, "/api/products/delete/**").hasRole("ADMIN")
 
+                // Public static & images
+                .requestMatchers("/uploads/**").permitAll()
+
+                // Public auth & oauth
                 .requestMatchers("/api/auth/**","/api/contact/**", "/oauth2/**", "/login/**").permitAll()
-//                .requestMatchers("/api/contact/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/categories/**").permitAll()
-                .requestMatchers("/api/admin/users/**").permitAll()
-                .requestMatchers("/api/admin/coupons/**").permitAll()
-                .requestMatchers("api/admin/**").permitAll()
 
-                .requestMatchers("/api/products/categories-with-subcategories").permitAll()
-                .requestMatchers("/api/cart/**").authenticated()
-                .requestMatchers("/api/admin/login", "/api/admin/register").permitAll() // ✅ allow login & register
+                // 🔥 Allow related products API
+                .requestMatchers("/api/products/related/**").permitAll()
 
-
+                // Public product browsing
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                .requestMatchers("/api/paypal/**").permitAll()
+                .requestMatchers("/api/products/categories-with-subcategories").permitAll()
+                .requestMatchers("/api/products/search").permitAll()
 
-                .requestMatchers("/api/categories/**").permitAll()
-                .requestMatchers("/ratings/**", "/comments/**").authenticated()
-                .requestMatchers("/api/user/me").authenticated()
+                // Admin only
+                .requestMatchers(HttpMethod.DELETE, "/api/products/delete/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+                // Cart & user
                 .requestMatchers("/api/cart/**").authenticated()
-//                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/user/me").authenticated()
+
+                // Paypal & categories
+                .requestMatchers("/api/paypal/**").permitAll()
+                .requestMatchers("/api/categories/**").permitAll()
+
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exception -> exception
@@ -110,11 +112,11 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ CORS configuration for React
+    // CORS for React
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // React app origin
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
@@ -123,6 +125,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-    
    
 }

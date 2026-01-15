@@ -13,6 +13,7 @@
 # ======================
 .env
 *.env
+src/main/resources/application-secret.properties   # <-- add this
 
 # ======================
 # React Frontend (NeoKart-Frontend)
