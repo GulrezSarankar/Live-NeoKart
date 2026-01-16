@@ -1,18 +1,19 @@
 import axios from "axios";
 
-// Create axios instance
+const BASE_URL =
+  process.env.REACT_APP_API_URL || "http://localhost:4000";
+
 const AdminApiAxiosInstance = axios.create({
-  baseURL: "http://localhost:4000/api", // Note: /admin prefix
+  baseURL: `${BASE_URL}/api`,
   timeout: 20000,
+  withCredentials: true,
 });
 
-// Attach token automatically to all requests
 AdminApiAxiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("adminToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("axiosInstance: attaching token", token);
     }
     return config;
   },
