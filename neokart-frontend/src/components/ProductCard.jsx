@@ -3,35 +3,25 @@ import { motion } from "framer-motion";
 import { Star, ShoppingCart, Eye } from "lucide-react";
 
 const ProductCard = ({ product, rating, onViewDetails, onAddToCart }) => {
-  const BASE_URL = "http://localhost:4000";
+  const BASE_URL = process.env.REACT_APP_API_URL;
 
-  // ✅ Safely handle missing props
   const handleView = () => {
-    if (typeof onViewDetails === "function") {
-      onViewDetails(product);
-    } else {
-      console.warn("⚠️ onViewDetails not provided for product:", product.name);
-    }
+    if (typeof onViewDetails === "function") onViewDetails(product);
   };
 
   const handleAdd = () => {
-    if (typeof onAddToCart === "function") {
-      onAddToCart(product);
-    } else {
-      console.warn("⚠️ onAddToCart not provided for product:", product.name);
-    }
+    if (typeof onAddToCart === "function") onAddToCart(product);
   };
 
   const getPrimaryImage = () => {
     if (!product.images || product.images.length === 0) {
-      return "/placeholder.png"; // Default placeholder image
+      return "/placeholder.png";
     }
 
     const primary = product.images.find((img) => img.primary);
     const imagePath = primary ? primary.imageUrl : product.images[0].imageUrl;
-
-    // Ensure path starts with a '/'
     const normalizedPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+
     return `${BASE_URL}${normalizedPath}`;
   };
 
@@ -43,62 +33,34 @@ const ProductCard = ({ product, rating, onViewDetails, onAddToCart }) => {
   return (
     <div
       onClick={handleView}
-      className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden group relative border border-transparent dark:hover:border-slate-700 hover:shadow-2xl transition-all duration-300 cursor-pointer"
+      className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden cursor-pointer"
     >
-      {/* Product Image Container */}
-      <div className="relative w-full h-56 bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-56">
         <motion.img
           src={getPrimaryImage()}
-          alt={product.name || "Product image"}
-          className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500 ease-in-out"
+          alt={product.name}
+          className="w-full h-full object-contain p-4"
           onError={(e) => (e.target.src = "/placeholder.png")}
         />
 
-        {/* Hover Actions */}
-        <div className="absolute top-0 left-0 w-full h-full bg-black/20 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAdd();
-            }}
-            className="bg-white text-slate-800 rounded-full w-12 h-12 flex items-center justify-center transform hover:scale-110 hover:bg-green-400 hover:text-white transition-all duration-300 shadow-md"
-            aria-label="Add to cart"
-          >
-            <ShoppingCart size={22} />
+        <div className="absolute inset-0 flex justify-center items-center gap-3 opacity-0 hover:opacity-100">
+          <button onClick={(e) => { e.stopPropagation(); handleAdd(); }}>
+            <ShoppingCart />
           </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleView();
-            }}
-            className="bg-white text-slate-800 rounded-full w-12 h-12 flex items-center justify-center transform hover:scale-110 hover:bg-blue-400 hover:text-white transition-all duration-300 shadow-md"
-            aria-label="View details"
-          >
-            <Eye size={22} />
+          <button onClick={(e) => { e.stopPropagation(); handleView(); }}>
+            <Eye />
           </button>
         </div>
       </div>
 
-      {/* Product Details */}
-      <div className="p-4 text-left">
-        <h3 className="text-md font-semibold mb-1 truncate text-slate-800 dark:text-slate-100">
-          {product.name}
-        </h3>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mb-3 line-clamp-1">
-          {product.description}
-        </p>
+      <div className="p-4">
+        <h3 className="font-bold">{product.name}</h3>
+        <p>{formattedPrice}</p>
 
-        <div className="flex items-center justify-between mt-auto">
-          <span className="text-slate-900 dark:text-white font-bold text-lg">
-            {formattedPrice}
-          </span>
-          <div className="flex items-center bg-yellow-400/20 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded-full">
-            <Star className="fill-current" size={14} />
-            <span className="ml-1 font-medium text-sm">
-              {rating ? parseFloat(rating).toFixed(1) : "4.5"}
-            </span>
-          </div>
+        <div className="flex items-center">
+          <Star size={14} />
+          <span>{rating || "4.5"}</span>
         </div>
       </div>
     </div>
