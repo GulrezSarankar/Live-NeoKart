@@ -17,6 +17,8 @@ import axiosInstance from "../api/axiosInstance";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
 
+const BASE_URL = process.env.REACT_APP_API_URL;
+
 const StarRating = ({ rating = 0 }) => (
   <div className="flex items-center gap-1">
     {[...Array(5)].map((_, i) => (
@@ -38,13 +40,12 @@ const ProductDetails = () => {
   const { user } = useAuth();
   const { addItem } = useCart();
 
-  // ✅ All hooks declared at top
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false); // ✅ moved up here
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -52,13 +53,12 @@ const ProductDetails = () => {
         setLoading(true);
         const res = await axiosInstance.get(`/products/${id}`);
         setProduct(res.data);
+
         if (res.data.category) {
           const relRes = await axiosInstance.get(
             `/products/category/${encodeURIComponent(res.data.category)}`
           );
-          setRelated(
-            relRes.data.filter((p) => p.id !== res.data.id).slice(0, 4)
-          );
+          setRelated(relRes.data.filter((p) => p.id !== res.data.id).slice(0, 4));
         }
       } catch (err) {
         toast.error("Failed to load product details");
@@ -90,18 +90,16 @@ const ProductDetails = () => {
     navigate("/checkout", { state: { items: [{ ...product, quantity: 1 }] } });
   };
 
-  // 🌀 Loading State
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen text-gray-600 dark:text-gray-300 animate-pulse">
+      <div className="flex items-center justify-center min-h-screen animate-pulse">
         Loading product details...
       </div>
     );
 
-  // 🚫 Not Found
   if (!product)
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center">
+      <div className="flex flex-col items-center justify-center min-h-screen">
         <h2 className="text-3xl font-bold text-red-500">Product Not Found</h2>
         <button
           onClick={() => navigate("/")}
@@ -115,41 +113,37 @@ const ProductDetails = () => {
   const images = product.images || [];
   const mainImage =
     images.length > 0
-      ? `http://localhost:4000${images[mainImageIndex].imageUrl}`
-      : `http://localhost:4000${product.imageUrl}`;
+      ? `${BASE_URL}${images[mainImageIndex].imageUrl}`
+      : `${BASE_URL}${product.imageUrl}`;
 
   const DESCRIPTION_LIMIT = 250;
   const showFullDescription = product.description?.length > DESCRIPTION_LIMIT;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-950 dark:to-black">
+    <div className="min-h-screen bg-gray-50">
       <Toaster position="bottom-center" />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* 🔙 Back */}
+      <main className="max-w-7xl mx-auto px-4 py-10">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 transition mb-6"
+          className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6"
         >
           <ArrowLeft size={20} /> Back
         </button>
 
-        <div className="grid lg:grid-cols-2 gap-10 items-start">
-          {/* 🖼️ Product Gallery */}
-          <div className="space-y-6">
-            <motion.div
-              className="relative rounded-3xl bg-white dark:bg-gray-800 overflow-hidden shadow-xl border border-gray-200 dark:border-gray-700"
-              whileHover={{ scale: 1.02 }}
-            >
+        <div className="grid lg:grid-cols-2 gap-10">
+          <div>
+            <div className="relative bg-white rounded-xl shadow overflow-hidden">
               <img
                 src={mainImage}
                 alt={product.name}
                 onMouseEnter={() => setZoom(true)}
                 onMouseLeave={() => setZoom(false)}
-                className={`w-full h-[480px] object-contain transition-all duration-500 ${
+                className={`w-full h-[480px] object-contain transition-transform ${
                   zoom ? "scale-110" : "scale-100"
                 }`}
               />
+
               {images.length > 1 && (
                 <>
                   <button
@@ -158,7 +152,7 @@ const ProductDetails = () => {
                         (mainImageIndex - 1 + images.length) % images.length
                       )
                     }
-                    className="absolute top-1/2 left-4 -translate-y-1/2 bg-gray-900/70 text-white rounded-full p-2 hover:bg-gray-800"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/70 text-white p-2 rounded-full"
                   >
                     <ChevronLeft size={18} />
                   </button>
@@ -166,27 +160,25 @@ const ProductDetails = () => {
                     onClick={() =>
                       setMainImageIndex((mainImageIndex + 1) % images.length)
                     }
-                    className="absolute top-1/2 right-4 -translate-y-1/2 bg-gray-900/70 text-white rounded-full p-2 hover:bg-gray-800"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/70 text-white p-2 rounded-full"
                   >
                     <ChevronRight size={18} />
                   </button>
                 </>
               )}
-            </motion.div>
+            </div>
 
-            {/* Thumbnails */}
             {images.length > 1 && (
-              <div className="flex gap-4 justify-center">
+              <div className="flex gap-3 mt-4 justify-center">
                 {images.map((img, i) => (
                   <img
                     key={i}
-                    src={`http://localhost:4000${img.imageUrl}`}
-                    alt=""
+                    src={`${BASE_URL}${img.imageUrl}`}
                     onClick={() => setMainImageIndex(i)}
-                    className={`w-20 h-20 rounded-xl border-2 object-cover cursor-pointer transition-all ${
+                    className={`w-20 h-20 object-cover rounded cursor-pointer border ${
                       i === mainImageIndex
-                        ? "border-blue-600 scale-110"
-                        : "border-gray-300 hover:scale-105"
+                        ? "border-blue-600"
+                        : "border-gray-300"
                     }`}
                   />
                 ))}
@@ -194,112 +186,67 @@ const ProductDetails = () => {
             )}
           </div>
 
-          {/* 🧾 Product Info */}
-          <div className="flex flex-col gap-6">
-            <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-4 py-1 text-sm font-semibold rounded-full uppercase tracking-wide w-fit">
-              {product.category}
-            </span>
-
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              {product.name}
-            </h1>
-
+          <div className="space-y-6">
+            <span className="text-blue-600 font-semibold">{product.category}</span>
+            <h1 className="text-4xl font-bold">{product.name}</h1>
             <StarRating rating={4.5} />
 
-            <div className="flex items-center gap-3">
-              <p className="text-4xl font-bold text-gray-900 dark:text-white">
-                ₹{product.price.toLocaleString()}
-              </p>
-              <span className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
-                <ShieldCheck size={18} /> In Stock
-              </span>
-            </div>
+            <p className="text-3xl font-bold">₹{product.price.toLocaleString()}</p>
 
-            <div className="text-gray-600 dark:text-gray-300 leading-relaxed text-base">
+            <p className="text-gray-600">
               {showFullDescription && !expanded
                 ? `${product.description.substring(0, DESCRIPTION_LIMIT)}...`
                 : product.description}
               {showFullDescription && (
                 <button
                   onClick={() => setExpanded(!expanded)}
-                  className="ml-2 text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+                  className="ml-2 text-blue-600 font-semibold"
                 >
                   {expanded ? "Show Less" : "Read More"}
                 </button>
               )}
-            </div>
+            </p>
 
-            <div className="grid grid-cols-3 gap-4 py-4 border-y dark:border-gray-700">
-              <div className="flex flex-col items-center">
-                <Truck className="text-blue-500 mb-2" />
-                <span className="font-medium text-sm">Fast Delivery</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <Package className="text-blue-500 mb-2" />
-                <span className="font-medium text-sm">Secure Packaging</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <ShieldCheck className="text-blue-500 mb-2" />
-                <span className="font-medium text-sm">1-Year Warranty</span>
-              </div>
-            </div>
-
-            {/* 🛒 Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
+            <div className="flex gap-4">
+              <button
                 onClick={handleAddToCart}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl border border-gray-700 dark:border-gray-300 text-gray-900 dark:text-white font-bold hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900 shadow-lg transition-all duration-200"
+                className="flex-1 bg-gray-900 text-white py-3 rounded-lg flex items-center justify-center gap-2"
               >
-                <ShoppingCart size={22} /> Add to Cart
-              </motion.button>
-
-              <motion.button
-                whileTap={{ scale: 0.95 }}
+                <ShoppingCart size={20} /> Add to Cart
+              </button>
+              <button
                 onClick={handleBuyNow}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-200"
+                className="flex-1 bg-blue-600 text-white py-3 rounded-lg flex items-center justify-center gap-2"
               >
-                <Zap size={22} /> Buy Now
-              </motion.button>
+                <Zap size={20} /> Buy Now
+              </button>
             </div>
           </div>
         </div>
 
-        {/* 🔗 Related */}
         {related.length > 0 && (
-          <section className="mt-20">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
+          <section className="mt-16">
+            <h2 className="text-2xl font-bold mb-6 text-center">
               You Might Also Like
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {related.map((item, i) => (
-                <motion.div
+              {related.map((item) => (
+                <Link
                   key={item.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
+                  to={`/product/${item.id}`}
+                  className="bg-white rounded-lg shadow hover:shadow-lg transition"
                 >
-                  <Link
-                    to={`/product/${item.id}`}
-                    className="group block bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all"
-                  >
-                    <img
-                      src={`http://localhost:4000${
-                        item.images?.[0]?.imageUrl || item.imageUrl
-                      }`}
-                      alt={item.name}
-                      className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-800 dark:text-white truncate group-hover:text-blue-600">
-                        {item.name}
-                      </h3>
-                      <p className="font-bold text-gray-900 dark:text-white mt-1">
-                        ₹{item.price.toLocaleString()}
-                      </p>
-                    </div>
-                  </Link>
-                </motion.div>
+                  <img
+                    src={`${BASE_URL}${item.images?.[0]?.imageUrl || item.imageUrl}`}
+                    className="h-40 w-full object-cover rounded-t-lg"
+                  />
+                  <div className="p-3">
+                    <p className="font-semibold truncate">{item.name}</p>
+                    <p className="font-bold text-blue-600">
+                      ₹{item.price.toLocaleString()}
+                    </p>
+                  </div>
+                </Link>
               ))}
             </div>
           </section>

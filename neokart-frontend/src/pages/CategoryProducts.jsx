@@ -17,18 +17,22 @@ export default function CategoryProducts() {
   );
   const navigate = useNavigate();
 
+  const BASE_URL = process.env.REACT_APP_API_URL;
+
   // Fetch products
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/api/products/category/${categoryName}`)
+      .get(`${BASE_URL}/api/products/category/${categoryName}`)
       .then((res) => {
         setProducts(res.data);
-        const subs = Array.from(new Set(res.data.map((p) => p.subCategory).filter(Boolean)));
+        const subs = Array.from(
+          new Set(res.data.map((p) => p.subCategory).filter(Boolean))
+        );
         setSubCategories(subs);
         setFilterSubCategory("All");
       })
       .catch((err) => console.error(err));
-  }, [categoryName]);
+  }, [categoryName, BASE_URL]);
 
   // Save wishlist in localStorage
   useEffect(() => {
@@ -66,7 +70,6 @@ export default function CategoryProducts() {
         </h2>
 
         <div className="flex items-center gap-3">
-          {/* Subcategory Dropdown */}
           {subCategories.length > 0 && (
             <select
               value={filterSubCategory}
@@ -82,7 +85,6 @@ export default function CategoryProducts() {
             </select>
           )}
 
-          {/* Sort Dropdown */}
           <select
             value={sortOption}
             onChange={(e) => handleSort(e.target.value)}
@@ -95,7 +97,6 @@ export default function CategoryProducts() {
             <option value="name-za">Name: Z → A</option>
           </select>
 
-          {/* View Toggle */}
           <button
             className={`p-2 rounded-lg ${view === "grid" ? "bg-blue-100 text-blue-600" : "text-gray-500"}`}
             onClick={() => setView("grid")}
@@ -130,10 +131,9 @@ export default function CategoryProducts() {
               transition={{ duration: 0.2 }}
               className={`border rounded-2xl p-4 shadow-sm hover:shadow-lg bg-white flex ${view === "list" ? "flex-row gap-6" : "flex-col"}`}
             >
-              {/* Product Image */}
               <div className="relative w-full sm:w-40">
                 <img
-                  src={`http://localhost:4000${product.imageUrl}`}
+                  src={`${BASE_URL}${product.imageUrl}`}
                   alt={product.name}
                   className="w-full h-40 object-cover rounded-lg"
                 />
@@ -148,7 +148,6 @@ export default function CategoryProducts() {
                 </button>
               </div>
 
-              {/* Product Info */}
               <div className="flex-1 mt-3 sm:mt-0">
                 <h3 className="font-bold text-base sm:text-lg text-gray-900 truncate">{product.name}</h3>
                 <p className="text-gray-600 text-xs sm:text-sm mt-1 line-clamp-2">{product.description}</p>

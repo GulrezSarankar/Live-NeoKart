@@ -9,7 +9,7 @@ const OrderSuccess = () => {
   const navigate = useNavigate();
 
   // orderId passed from checkout page
-  const { orderId } = location.state || {};
+  const orderId = location.state?.orderId || null;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">

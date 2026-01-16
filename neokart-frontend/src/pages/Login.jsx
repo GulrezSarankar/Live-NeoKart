@@ -11,11 +11,13 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  const BASE_URL = process.env.REACT_APP_API_URL;
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:4000/api/auth/login", {
+      const response = await axios.post(`${BASE_URL}/api/auth/login`, {
         email,
         password,
       });
@@ -25,18 +27,12 @@ const LoginPage = () => {
         localStorage.setItem("userRole", response.data.role);
         localStorage.setItem("userName", response.data.name);
 
-        // ✅ Success toast
         toast.success(`🎉 Welcome ${response.data.name}!`, {
           position: "top-right",
           autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
           theme: "colored",
         });
 
-        // Navigate after short delay
         setTimeout(() => {
           if (response.data.role === "ADMIN") {
             navigate("/admin/dashboard");
@@ -45,7 +41,6 @@ const LoginPage = () => {
           }
         }, 1500);
       } else {
-        // ❌ Error toast
         toast.error("Invalid login credentials", {
           position: "top-right",
           autoClose: 3000,
@@ -53,7 +48,6 @@ const LoginPage = () => {
         });
       }
     } catch (err) {
-      // ❌ Error toast for server/network issues
       toast.error("Login failed. Please check your email & password.", {
         position: "top-right",
         autoClose: 3000,
@@ -66,7 +60,6 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden">
         
-        {/* Left Section - Form */}
         <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center">
           <h1 className="text-2xl font-bold text-orange-500 mb-6">Logo Here</h1>
           <h2 className="text-lg text-gray-600 mb-1">Welcome back !!!</h2>
@@ -121,7 +114,6 @@ const LoginPage = () => {
           </p>
         </div>
 
-        {/* Right Section - Illustration */}
         <div className="hidden md:flex w-1/2 bg-orange-50 items-center justify-center">
           <img
             src={loginIllustration}
@@ -131,7 +123,6 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* ✅ Toast Container */}
       <ToastContainer />
     </div>
   );

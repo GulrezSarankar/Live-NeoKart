@@ -5,13 +5,14 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [step, setStep] = useState(1); // 1 = send OTP, 2 = reset password
+  const [step, setStep] = useState(1);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const navigate = useNavigate();
+  const BASE_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -37,7 +38,7 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/api/auth/forgot-password", {
+      const res = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -45,7 +46,7 @@ export default function ForgotPassword() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage(data.message || "OTP sent successfully to your registered phone.");
+        setMessage(data.message || "OTP sent successfully.");
         setStep(2);
         setResendCooldown(30);
       } else {
@@ -72,7 +73,7 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/api/auth/reset-password", {
+      const res = await fetch(`${BASE_URL}/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, newPassword }),
@@ -80,12 +81,12 @@ export default function ForgotPassword() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Password reset successfully! Please login with your new password.");
+        alert("Password reset successfully! Please login.");
         setStep(1);
         setEmail("");
         setOtp("");
         setNewPassword("");
-        navigate("/login"); // redirect to login page after success
+        navigate("/login");
       } else {
         setError(data.error || "Failed to reset password");
       }
@@ -117,7 +118,11 @@ export default function ForgotPassword() {
             disabled={loading || resendCooldown > 0}
             className="bg-blue-600 text-white p-2 rounded w-full hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? "Sending OTP..." : resendCooldown > 0 ? `Resend OTP (${resendCooldown}s)` : "Send OTP"}
+            {loading
+              ? "Sending OTP..."
+              : resendCooldown > 0
+              ? `Resend OTP (${resendCooldown}s)`
+              : "Send OTP"}
           </button>
         </>
       )}
@@ -130,7 +135,7 @@ export default function ForgotPassword() {
             required
             maxLength={6}
             value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/, ""))} // only digits
+            onChange={(e) => setOtp(e.target.value.replace(/\D/, ""))}
             className="border p-2 rounded w-full mb-4"
           />
           <input
