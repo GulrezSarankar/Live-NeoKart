@@ -236,6 +236,15 @@ public class ProductConroller {
                     .body(Map.of("error", "⚠️ " + e.getMessage()));
         }
     }
+    
+    @GetMapping("/related/{category}/{productId}")
+    public ResponseEntity<List<ProductWithRatingDTO>> getRelatedWithRating(
+            @PathVariable String category,
+            @PathVariable Long productId
+    ) {
+        return ResponseEntity.ok(productService.getRelatedWithRating(category, productId));
+    }
+
 
 	
 }

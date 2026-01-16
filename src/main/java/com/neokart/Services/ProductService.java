@@ -393,6 +393,10 @@ public class ProductService {
 
 
  
+    public List<ProductWithRatingDTO> getRelatedWithRating(String category, Long productId) {
+        return productRepository.findRelatedWithRating(category, productId);
+    }
+
 }
 
 
