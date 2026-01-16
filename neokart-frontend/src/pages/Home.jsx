@@ -17,7 +17,8 @@
     const [loading, setLoading] = useState(true);
     const [sortOption, setSortOption] = useState("default");
     const navigate = useNavigate();
-    const BASE_URL = "http://localhost:4000";
+    const BASE_URL = process.env.REACT_APP_API_URL;
+
 
     // ✅ Fetch products
     useEffect(() => {
