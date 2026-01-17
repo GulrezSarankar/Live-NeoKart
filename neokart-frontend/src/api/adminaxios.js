@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_API_URL;
+const BASE_URL = process.env.REACT_APP_API_URL || "https://neokart-1qne.onrender.com";
 
 const AdminApiAxiosInstance = axios.create({
   baseURL: `${BASE_URL}/api`,
@@ -17,6 +17,16 @@ AdminApiAxiosInstance.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+AdminApiAxiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("adminToken");
+    }
+    return Promise.reject(error);
+  }
 );
 
 export default AdminApiAxiosInstance;
