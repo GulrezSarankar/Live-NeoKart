@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins(
+            .allowedOriginPatterns(
                 "http://localhost:3000",
                 "https://live-neo-kart.vercel.app"
             )
@@ -29,5 +29,6 @@ public class WebConfig implements WebMvcConfigurer {
             .allowedHeaders("*")
             .allowCredentials(true);
     }
+
 	
 }

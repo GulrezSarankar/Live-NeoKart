@@ -1,8 +1,8 @@
 import React from "react";
 
+const BASE_URL = process.env.REACT_APP_API_URL;
 
 const ProductList = ({ product, onClick }) => {
-  // Helper to render stars for rating (out of 5)
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
     const halfStar = rating - fullStars >= 0.5;
@@ -11,40 +11,23 @@ const ProductList = ({ product, onClick }) => {
     return (
       <div className="flex items-center justify-center mt-1">
         {[...Array(fullStars)].map((_, i) => (
-          <svg
-            key={"full" + i}
-            className="w-4 h-4 text-yellow-400"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
+          <svg key={"full" + i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.286 3.966c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.286-3.966a1 1 0 00-.364-1.118L3.622 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z" />
           </svg>
         ))}
         {halfStar && (
-          <svg
-            className="w-4 h-4 text-yellow-400"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
+          <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
             <defs>
               <linearGradient id="halfGradient">
                 <stop offset="50%" stopColor="currentColor" />
-                <stop offset="50%" stopColor="transparent" stopOpacity="1" />
+                <stop offset="50%" stopColor="transparent" />
               </linearGradient>
             </defs>
-            <path
-              fill="url(#halfGradient)"
-              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.286 3.966c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.286-3.966a1 1 0 00-.364-1.118L3.622 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z"
-            />
+            <path fill="url(#halfGradient)" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.286 3.966c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.286-3.966a1 1 0 00-.364-1.118L3.622 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z" />
           </svg>
         )}
         {[...Array(emptyStars)].map((_, i) => (
-          <svg
-            key={"empty" + i}
-            className="w-4 h-4 text-gray-300"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
+          <svg key={"empty" + i} className="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.286 3.966c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.286-3.966a1 1 0 00-.364-1.118L3.622 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z" />
           </svg>
         ))}
@@ -59,7 +42,7 @@ const ProductList = ({ product, onClick }) => {
       title={product.name}
     >
       <img
-        src={`http://localhost:4000${product.imageUrl}`}
+        src={`${BASE_URL}${product.imageUrl}`}
         alt={product.name}
         className="w-full h-48 object-cover rounded mb-4"
         loading="lazy"
