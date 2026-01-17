@@ -21,8 +21,10 @@ import com.neokart.Services.RefundService;
 
 @RestController
 @RequestMapping("/api/wallet")
-@CrossOrigin(origins = "http://localhost:3000")
-public class PaymentWalletController {
+@CrossOrigin(origins = {
+	    "http://localhost:3000",
+	    "https://live-neo-kart.vercel.app"
+	})public class PaymentWalletController {
 
 	@Autowired
 	PaymentWalletService service;

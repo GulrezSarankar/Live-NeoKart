@@ -16,8 +16,10 @@ import com.neokart.Services.UserService;
 
 @RestController
 @RequestMapping("/api/admin/users")
-@CrossOrigin(origins = "http://localhost:3000")
-public class UserController {
+@CrossOrigin(origins = {
+	    "http://localhost:3000",
+	    "https://live-neo-kart.vercel.app"
+	})public class UserController {
 	
 	
     @Autowired

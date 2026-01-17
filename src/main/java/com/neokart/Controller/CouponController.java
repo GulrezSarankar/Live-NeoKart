@@ -21,8 +21,10 @@ import com.neokart.Services.CouponService;
 
 @RestController
 @RequestMapping("/api/admin/coupons")
-@CrossOrigin(origins = "http://localhost:3000")
-
+@CrossOrigin(origins = {
+	    "http://localhost:3000",
+	    "https://live-neo-kart.vercel.app"
+	})
 public class CouponController {
 	
 	

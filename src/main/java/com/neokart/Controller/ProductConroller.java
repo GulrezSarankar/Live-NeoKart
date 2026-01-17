@@ -34,8 +34,10 @@ import com.neokart.Services.ProductService;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "http://localhost:3000")
-
+@CrossOrigin(origins = {
+	    "http://localhost:3000",
+	    "https://live-neo-kart.vercel.app"
+	})
 public class ProductConroller {
 	
     @Autowired

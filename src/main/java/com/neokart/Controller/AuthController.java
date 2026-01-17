@@ -27,8 +27,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
-public class AuthController {
+@CrossOrigin(origins = {
+	    "http://localhost:3000",
+	    "https://live-neo-kart.vercel.app"
+	})public class AuthController {
 	
 	@Autowired
     private  AuthService authService;

@@ -19,8 +19,10 @@ import com.neokart.Services.FlashSaleService;
 
 @RestController
 @RequestMapping("/api/admin/flash-sales")
-@CrossOrigin(origins = "http://localhost:3000")
-
+@CrossOrigin(origins = {
+	    "http://localhost:3000",
+	    "https://live-neo-kart.vercel.app"
+	})
 public class FlashSaleController {
 	
     @Autowired

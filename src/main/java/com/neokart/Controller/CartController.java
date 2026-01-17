@@ -23,8 +23,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
-	
+@CrossOrigin(origins = {
+	    "http://localhost:3000",
+	    "https://live-neo-kart.vercel.app"
+	})	
 public class CartController {
 		
 		@Autowired
