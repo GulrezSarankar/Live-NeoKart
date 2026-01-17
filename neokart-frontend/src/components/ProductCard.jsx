@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Star, ShoppingCart, Eye } from "lucide-react";
 
 const ProductCard = ({ product, rating, onViewDetails, onAddToCart }) => {
-  const BASE_URL = process.env.REACT_APP_API_URL;
+  const BASE_URL = process.env.REACT_APP_API_URL || "https://neokart-1qne.onrender.com";
 
   const handleView = () => {
     if (typeof onViewDetails === "function") onViewDetails(product);
