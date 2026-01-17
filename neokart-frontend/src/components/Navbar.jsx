@@ -32,7 +32,7 @@ export default function Navbar({ cartCount = 0 }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axiosInstance.get("/products/categories-with-subcategories");
+        const res = await axiosInstance.get("api/products/categories-with-subcategories");
         const cleanData = res.data.map((cat) => ({
           ...cat,
           subCategories: (cat.subCategories || []).filter((s) => s !== null),
