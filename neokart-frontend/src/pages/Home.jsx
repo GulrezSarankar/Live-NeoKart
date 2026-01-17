@@ -17,7 +17,7 @@
     const [loading, setLoading] = useState(true);
     const [sortOption, setSortOption] = useState("default");
     const navigate = useNavigate();
-    const BASE_URL = process.env.REACT_APP_API_URL;
+    const BASE_URL = "https://neokart-1qne.onrender.com";
 
 
     // ✅ Fetch products
