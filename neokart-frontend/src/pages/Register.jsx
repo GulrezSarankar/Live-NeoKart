@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
-import { Eye, EyeOff } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
@@ -17,8 +16,6 @@ export default function Register() {
   });
 
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -32,23 +29,18 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
     setLoading(true);
 
     try {
       const res = await axiosInstance.post("/auth/register", formData);
 
       if (res.data?.success) {
-        setSuccess("Registration successful! Redirecting to OTP verification...");
-
-        setTimeout(() => {
-          navigate("/verify-otp", {
-            state: {
-              email: res.data.email || formData.email,
-              phone: res.data.phone || formData.phone,
-            },
-          });
-        }, 1500);
+        navigate("/verify-otp", {
+          state: {
+            email: res.data.email,
+            phone: res.data.phone,
+          },
+        });
       } else {
         setError(res.data?.message || "Registration failed");
       }
@@ -67,7 +59,6 @@ export default function Register() {
         </h2>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        {success && <p className="text-green-600 text-center mb-4">{success}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
@@ -102,23 +93,15 @@ export default function Register() {
             }}
           />
 
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full p-3 border rounded-xl pr-10 focus:ring-2 focus:ring-blue-400"
-            />
-            <span
-              className="absolute right-3 top-3 cursor-pointer text-gray-500"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </span>
-          </div>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-400"
+          />
 
           <button
             type="submit"

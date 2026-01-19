@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// src/pages/VerifyOtp.jsx
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import { ShieldCheck } from "lucide-react";
@@ -7,9 +8,17 @@ export default function VerifyOtp() {
   const navigate = useNavigate();
   const location = useLocation();
   const { phone, email } = location.state || {};
+
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Redirect if opened directly without data
+  useEffect(() => {
+    if (!phone && !email) {
+      navigate("/register");
+    }
+  }, [phone, email, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,13 +26,16 @@ export default function VerifyOtp() {
     setSuccess("");
 
     try {
-      const res = await axiosInstance.post("/auth/verify-otp", { phone, otp });
+      const res = await axiosInstance.post("/auth/verify-otp", {
+        phone,
+        otp,
+      });
 
-      if (res.data.success) {
+      if (res.data?.success) {
         setSuccess(res.data.message || "OTP verified successfully!");
         setTimeout(() => navigate("/login"), 2000);
       } else {
-        setError(res.data.message || "Invalid OTP");
+        setError(res.data?.message || "Invalid OTP");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Verification failed!");
@@ -32,8 +44,8 @@ export default function VerifyOtp() {
 
   const resendOtp = async () => {
     try {
-      const res = await axiosInstance.post(`/auth/resend-otp/${phone}`);
-      alert(res.data.message || "OTP resent successfully!");
+      const res = await axiosInstance.post(`/auth/send-otp/${phone}`);
+      alert(res.data?.message || "OTP resent successfully!");
     } catch {
       alert("Failed to resend OTP!");
     }
@@ -63,7 +75,10 @@ export default function VerifyOtp() {
             className="w-full p-3 border rounded-xl"
           />
 
-          <button className="w-full bg-green-600 text-white py-3 rounded-xl">
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700"
+          >
             Verify OTP
           </button>
         </form>
